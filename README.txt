@@ -1,19 +1,20 @@
-RKK V4.1 — Rencana & Keuangan Keluarga
-Tablet • Free • Offline • Single Device
+RKK V4.2 — Rencana & Keuangan Keluarga
 
-Peningkatan V4.1:
-- Dashboard status Aman / Perhatian / OVER.
-- Persentase pemakaian rencana dan sinyal over budget.
-- Evaluasi menampilkan posisi: Sisa / Over / Kurang / Lebih.
-- Dashboard dan Laporan memakai periode bulan/tahun yang dipilih.
-- Transaksi yang dihubungkan ke rencana mengikuti jenis rencana agar evaluasi konsisten.
-- Data tetap memakai localStorage RKK_V4_TABLET_FREE sehingga data V4.0 tetap terbaca.
-- Service worker cache diperbarui untuk V4.1.
+V4.2 mempertahankan data V4.0/V4.1 dengan localStorage key yang sama: RKK_V4_TABLET_FREE.
 
-Install:
-1. Buka melalui GitHub Pages.
-2. Pilih Install / Tambahkan ke layar utama.
-3. Gunakan ikon RKK V4.1.
-4. Aplikasi dapat digunakan offline setelah cache pertama selesai.
+Tambahan utama V4.2:
+- Evaluasi keuangan per akun 3 tingkat: Kelompok → Kategori → Jenis Akun.
+- Ringkasan per kategori.
+- Filter evaluasi berdasarkan kelompok akun.
+- Penanda Aman, Perhatian, OVER, Tercapai, Belum tercapai, dan transaksi tanpa rencana.
+- Prioritas evaluasi di Dashboard.
+- Transaksi tanpa rencana tetap terlihat pada evaluasi akun dan ditandai.
+- Tetap tablet-first, standalone, gratis, offline, single-device.
 
-PENTING: backup data secara berkala melalui Pengaturan > Backup.
+Update melalui GitHub Pages:
+1. Replace file index.html, manifest.json, sw.js, icon-192.svg, icon-512.svg, README.txt di root repository.
+2. Tunggu GitHub Pages selesai deploy.
+3. Buka URL Pages dengan query ?v=42 bila cache lama masih tampil.
+4. Jangan Reset Data.
+
+Data tetap disimpan lokal di tablet. Backup berkala tetap disarankan.
