@@ -1,14 +1,19 @@
-RKK V4.0 — TABLET APP FREE/OFFLINE
+RKK V4.1 — Rencana & Keuangan Keluarga
+Tablet • Free • Offline • Single Device
 
-Cara pakai:
-1. Buka aplikasi melalui alamat HTTPS yang menyediakan folder ini.
-2. Tunggu sampai aplikasi selesai dimuat sekali saat online.
-3. Pilih "Pasang sebagai Aplikasi" bila tombol muncul.
-4. Setelah terpasang, buka dari ikon RKK V4.0. Mode standalone tidak menampilkan address bar.
-5. Data disimpan lokal di tablet melalui localStorage. Gunakan Backup secara berkala.
-6. Aplikasi dapat digunakan offline setelah aset awal berhasil dicache.
+Peningkatan V4.1:
+- Dashboard status Aman / Perhatian / OVER.
+- Persentase pemakaian rencana dan sinyal over budget.
+- Evaluasi menampilkan posisi: Sisa / Over / Kurang / Lebih.
+- Dashboard dan Laporan memakai periode bulan/tahun yang dipilih.
+- Transaksi yang dihubungkan ke rencana mengikuti jenis rencana agar evaluasi konsisten.
+- Data tetap memakai localStorage RKK_V4_TABLET_FREE sehingga data V4.0 tetap terbaca.
+- Service worker cache diperbarui untuk V4.1.
 
-Catatan:
-- Tidak membutuhkan langganan cloud.
-- Tidak membutuhkan akun developer Android.
-- V3.2 tetap dapat dipertahankan sebagai versi cadangan.
+Install:
+1. Buka melalui GitHub Pages.
+2. Pilih Install / Tambahkan ke layar utama.
+3. Gunakan ikon RKK V4.1.
+4. Aplikasi dapat digunakan offline setelah cache pertama selesai.
+
+PENTING: backup data secara berkala melalui Pengaturan > Backup.
