@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12304a">
+<title>RKK V4.4 FIX — Pemulihan Database</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef3f7;color:#172033;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+header{background:#12304a;color:white;padding:18px 16px}header h1{margin:0;font-size:21px}header p{margin:5px 0 0;opacity:.85}
+main{max-width:900px;margin:auto;padding:14px}.card{background:white;border:1px solid #d9e2ea;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 10px #12304a10}
+h2{margin-top:0}.notice{padding:12px;border-radius:12px;background:#eef6ff;border:1px solid #bfdbfe}
+.success{background:#ecfdf5;border-color:#a7f3d0}.warn{background:#fffbeb;border-color:#fde68a}.danger{background:#fef2f2;border-color:#fecaca}
+button{border:0;border-radius:10px;padding:12px 15px;font:inherit;font-weight:800;cursor:pointer;margin:4px 4px 4px 0}.primary{background:#1976d2;color:#fff}.secondary{background:#e5ebf0}.dangerbtn{background:#fee2e2;color:#991b1b}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px;border-bottom:1px solid #e5e7eb;font-size:13px}
+.small{font-size:13px;color:#64748b}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:#e2e8f0;font-size:11px;font-weight:800}
+#status{white-space:pre-wrap}.hidden{display:none}
+</style>
+</head>
+<body>
+<header><h1>RKK V4.4 FIX</h1><p>Diagnostic & Pemulihan Database</p></header>
+<main>
+<div class="card notice">
+<b>Tujuan halaman ini</b>
+<p>Memeriksa penyimpanan lokal RKK pada alamat GitHub Pages ini tanpa menghapus data. Jika ditemukan database RKK versi lama, data dapat dipulihkan ke database V4.4.</p>
+</div>
+
+<div class="card">
+<h2>1. Pemeriksaan Database</h2>
+<button class="primary" onclick="scan()">🔎 Periksa Database</button>
+<div id="status" class="small"></div>
+<div id="results"></div>
+</div>
+
+<div id="recoverCard" class="card hidden">
+<h2>2. Pulihkan Database</h2>
+<div class="notice warn">Pemulihan tidak menghapus database sumber. Data sumber tetap disimpan sebagai cadangan.</div>
+<div id="selectedInfo"></div>
+<button class="primary" onclick="recoverSelected()">♻️ Pulihkan ke RKK V4.4</button>
+<button class="secondary" onclick="location.href='./?v=44#dashboard'">Buka RKK V4.4</button>
+</div>
+
+<div class="card">
+<h2>3. Setelah Pemulihan</h2>
+<p class="small">Buka kembali RKK V4.4. Periksa Dashboard, Rencana, Transaksi, Evaluasi, dan Laporan. Jangan tekan Reset Data.</p>
+</div>
+</main>
+<script>
+const TARGET='RKK_V4_TABLET_FREE';
+let candidates=[], selected=null;
+
+function score(o){
+  if(!o || typeof o!=='object') return -1;
+  let s=0;
+  if(Array.isArray(o.plans)) s+=4;
+  if(Array.isArray(o.tx)) s+=4;
+  if(Array.isArray(o.accounts)) s+=3;
+  if(Array.isArray(o.targets)) s+=1;
+  if(o.settings && typeof o.settings==='object') s+=1;
+  return s;
+}
+function safe(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])}
+function scan(){
+  candidates=[]; selected=null;
+  const rows=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    let raw=localStorage.getItem(k), o=null;
+    try{o=JSON.parse(raw)}catch(e){}
+    const s=score(o);
+    if(s>=7){
+      const plans=Array.isArray(o.plans)?o.plans.length:0;
+      const tx=Array.isArray(o.tx)?o.tx.length:0;
+      const acc=Array.isArray(o.accounts)?o.accounts.length:0;
+      const targets=Array.isArray(o.targets)?o.targets.length:0;
+      candidates.push({key:k,obj:o,plans,tx,acc,targets,score:s});
+    }
+  }
+  candidates.sort((a,b)=>(b.plans+b.tx+b.acc)-(a.plans+a.tx+a.acc));
+  document.getElementById('status').textContent=
+    'Penyimpanan ditemukan: '+localStorage.length+' key\\nDatabase RKK yang cocok: '+candidates.length;
+  if(!candidates.length){
+    document.getElementById('results').innerHTML='<div class="card danger"><b>Belum ditemukan database RKK lama pada origin ini.</b><p class="small">Jangan reset data. Ini berarti data lama kemungkinan berada pada origin/aplikasi lain dan perlu pemeriksaan dari versi aplikasi yang sebelumnya digunakan.</p></div>';
+    document.getElementById('recoverCard').classList.add('hidden');
+    return;
+  }
+  rows.push('<table><thead><tr><th>Pilih</th><th>Key</th><th>Rencana</th><th>Transaksi</th><th>Akun</th><th>Target</th></tr></thead><tbody>');
+  candidates.forEach((c,idx)=>{
+    rows.push('<tr><td><input type="radio" name="db" value="'+idx+'" '+(idx===0?'checked':'')+' onchange="selectCandidate('+idx+')"></td><td><b>'+safe(c.key)+'</b></td><td>'+c.plans+'</td><td>'+c.tx+'</td><td>'+c.acc+'</td><td>'+c.targets+'</td></tr>');
+  });
+  rows.push('</tbody></table>');
+  document.getElementById('results').innerHTML=rows.join('');
+  selectCandidate(0);
+}
+function selectCandidate(i){
+  selected=candidates[i];
+  document.getElementById('selectedInfo').innerHTML=
+    '<p><b>Database dipilih:</b> <span class="pill">'+safe(selected.key)+'</span></p>'+
+    '<p>Rencana: <b>'+selected.plans+'</b> · Transaksi: <b>'+selected.tx+'</b> · Akun: <b>'+selected.acc+'</b> · Target: <b>'+selected.targets+'</b></p>';
+  document.getElementById('recoverCard').classList.remove('hidden');
+}
+function recoverSelected(){
+  if(!selected){alert('Pilih database terlebih dahulu.');return}
+  try{
+    const copy=JSON.parse(JSON.stringify(selected.obj));
+    copy.plans=Array.isArray(copy.plans)?copy.plans:[];
+    copy.tx=Array.isArray(copy.tx)?copy.tx:[];
+    copy.targets=Array.isArray(copy.targets)?copy.targets:[];
+    copy.accounts=Array.isArray(copy.accounts)&&copy.accounts.length?copy.accounts:[];
+    copy.settings=copy.settings||{year:new Date().getFullYear(),month:new Date().getMonth()+1};
+    copy._recoveredFrom=selected.key;
+    copy._recoveredAt=new Date().toISOString();
+    localStorage.setItem(TARGET,JSON.stringify(copy));
+    localStorage.setItem(TARGET+'_BACKUP_'+Date.now(),JSON.stringify(selected.obj));
+    alert('Pemulihan berhasil. Database sumber tetap dipertahankan sebagai cadangan.');
+    location.href='./?v=44#dashboard';
+  }catch(e){
+    alert('Pemulihan gagal: '+e.message);
+  }
+}
+scan();
+</script>
+</body>
+</html>
